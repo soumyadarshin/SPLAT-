@@ -1,0 +1,164 @@
+from django.shortcuts import render
+from django.http import HttpResponse,JsonResponse
+import os
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+import mimetypes
+import folium
+from fastkml import kml
+from pygeoif import geometry as pygeoif_geometry
+from shapely.geometry import shape, mapping
+import geojson
+import logging
+from .serializers import *
+from viewer.models import *
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.parsers import JSONParser
+
+
+
+logging.basicConfig(level=logging.DEBUG)
+def create_map():
+
+ 
+  map_center = [20.359142977029173, 85.82264111855899]
+
+  my_map = folium.Map(location=map_center, zoom_start=15)
+  
+  kml_file = os.path.join(settings.BASE_DIR, 'Bariflolabs-to-place2.kml')
+  geojson_features = []
+   
+  try:
+      with open(kml_file, 'rb') as f:
+          k = kml.KML()
+          k.from_string(f.read())
+          features = list(k.features())
+          if len(features) > 0 and isinstance(features[0], kml.Folder):
+              folder = features[0]
+              geojson_features = []
+              for feature in folder.features():
+                  geometry = feature.geometry
+                  logging.debug(f"Processing feature: {feature.name}")
+                  if isinstance(geometry, (pygeoif_geometry.Point, pygeoif_geometry.LineString, pygeoif_geometry.Polygon)):
+                      shapely_geometry = shape(geometry)
+                      geojson_feature = geojson.Feature(
+                          geometry=mapping(shapely_geometry),
+                          properties={
+                              "name": feature.name,
+                              "description": feature.description
+                          }
+                      )
+                      geojson_features.append(geojson_feature)
+                      logging.debug(f"Added feature: {feature.name}")
+                  else:
+                      logging.warning(f"Unsupported geometry type: {type(geometry)}")
+              geojson_data = geojson.FeatureCollection(geojson_features)
+          else:
+              logging.error("No folder found in KML file or folder is empty")
+  except Exception as e:
+      logging.error(f"Error reading KML file: {e}")
+      
+  geojson_data = geojson.FeatureCollection(geojson_features)
+      
+      
+  return my_map._repr_html_(), geojson_data
+
+
+def map_view(request):
+    map_html, geojson_data = create_map()
+    return render(request, 'index.html', {'map_html': map_html, 'geojson_data': geojson_data})
+    
+    
+def download_report(request, filename):
+    file_path = os.path.join(settings.BASE_DIR, filename)
+
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type='application/octet-stream')
+            response['Content-Disposition'] =f'attachment; filename={os.path.basename(file_path)}'
+            return response
+    else:
+        return HttpResponse('File not found', status=404)
+
+
+
+def download_path_analysis(request, filename):
+    file_path = os.path.join(settings.BASE_DIR, filename)
+
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type='application/octet-stream')
+            response['Content-Disposition'] = f'attachment; filename={os.path.basename(file_path)}'
+            return response
+    else:
+        return HttpResponse('File not found', status=404)
+    
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+    
+
+
+@csrf_exempt   
+def transmitter_data(request):
+    if request.method == 'POST':
+        try:
+            jsondata = JSONParser().parse(request)
+            transmitter_name = jsondata.get("transmitter_name")
+            lattitude = jsondata.get("lattitude")
+            longitude = jsondata.get("longitude")
+            antenna_height = jsondata.get("antenna_height")
+            
+            if not all([transmitter_name,lattitude,longitude,antenna_height]):
+                return JsonResponse({"error":"missing parameter"})
+            
+            else:
+                file_content = f"{transmitter_name}\n{lattitude}\n{longitude}\n{antenna_height}\n"
+                lrp_file_content = f"{5}\n{0.001}\n{301}\n{433}\n{5}\n{0}\n{0.5}\n{0.9}\n{0.0630957}\n"
+                file_name = f"{transmitter_name}.qth"
+                lrp_file_name = f"{transmitter_name}.lrp"
+                file_path = os.path.join(settings.BASE_DIR, file_name)
+                lrp_file_path = os.path.join(settings.BASE_DIR, lrp_file_name)
+
+                with open(file_path, 'w') as file:
+                    file.write(file_content)
+                with open(lrp_file_path, 'w') as file:
+                    file.write(lrp_file_content)
+            
+            
+            return JsonResponse({"message":"qth and lrp file created succefully", "file_path":file_path , "lrp_file_path":lrp_file_path})
+        except Exception as e:
+            return JsonResponse({"error":str(e)})
+    else:
+        return JsonResponse({"error":"invalid request method"})
+    
+
+
+@csrf_exempt
+def receiver_data(request):
+    if request.method == 'POST':
+        try:
+            jsondata = JSONParser().parse(request)
+            receiver_name = jsondata.get("receiver_name")
+            lattitude = jsondata.get("lattitude")
+            longitude = jsondata.get("longitude")
+            antenna_height = jsondata.get("antenna_height")
+
+            if not all([receiver_name,lattitude,longitude,antenna_height]):
+                return JsonResponse({"error":"missing parameter"})
+
+            else:
+                file_content = f"{receiver_name}\n{lattitude}\n{longitude}\n{antenna_height}\n"
+                file_name = f"{receiver_name}.qth"
+                file_path = os.path.join(settings.BASE_DIR, file_name)
+
+                with open(file_path, 'w')as file:
+                    file.write(file_content)
+
+                    
+            return JsonResponse({"message":"qth file created successsfully", "file_path":file_path})
+        except Exception as e:
+            return JsonResponse({"error":str(e)})
+    else:
+        return JsonResponse({"error":"invalid request method"})

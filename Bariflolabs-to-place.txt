@@ -1,0 +1,65 @@
+
+		--==[ SPLAT! v1.4.2 Path Analysis ]==--
+
+---------------------------------------------------------------------------
+
+Transmitter site: Bariflolabs
+Site location: 20.3592 North / 274.1774 West (20° 21' 33" N / 274° 10' 38" W)
+Ground elevation: 0.00 feet AMSL
+Antenna height: 1.00 feet AGL / 1.00 feet AMSL
+Distance to place: 0.66 miles
+Azimuth to place: 317.51 degrees
+Elevation angle to place: +0.0280 degrees
+
+---------------------------------------------------------------------------
+
+Receiver site: place
+Site location: 20.3663 North / 274.1843 West (20° 21' 58" N / 274° 11' 3" W)
+Ground elevation: 0.00 feet AMSL
+Antenna height: 3.00 feet AGL / 3.00 feet AMSL
+Distance to Bariflolabs: 0.66 miles
+Azimuth to Bariflolabs: 137.50 degrees
+Depression angle to Bariflolabs: -0.0376 degrees
+
+---------------------------------------------------------------------------
+
+ITWOM Version 3.0 Parameters Used In This Analysis:
+
+Earth's Dielectric Constant: 5.000
+Earth's Conductivity: 0.001 Siemens/meter
+Atmospheric Bending Constant (N-units): 301.000 ppm
+Frequency: 433.000 MHz
+Radio Climate: 5 (Continental Temperate)
+Polarization: 0 (Horizontal)
+Fraction of Situations: 50.0%
+Fraction of Time: 90.0%
+Transmitter ERP: 63.1 milliwatts (+18.00 dBm)
+Transmitter EIRP: 103.3 milliwatts (+20.14 dBm)
+
+---------------------------------------------------------------------------
+
+Summary For The Link Between Bariflolabs and place:
+
+Free space path loss: 85.74 dB
+ITWOM Version 3.0 path loss: 106.26 dB
+Attenuation due to terrain shielding: 20.52 dB
+Field strength at place: 43.87 dBuV/meter
+Signal power level at place: -86.12 dBm
+Signal power density at place: -101.91 dBW per square meter
+Voltage across a 50 ohm dipole at place: 14.14 uV (23.01 dBuV)
+Voltage across a 75 ohm dipole at place: 17.32 uV (24.77 dBuV)
+Mode of propagation: Line of Sight
+ITWOM error number: 4
+  Warning: Some parameters are out of range.
+  Results are probably invalid.
+
+---------------------------------------------------------------------------
+
+
+No obstructions to LOS path due to terrain were detected by SPLAT!
+
+Antenna at place must be raised to at least 283.00 feet AGL
+to clear the first Fresnel zone.
+
+Antenna at place must be raised to at least 166.00 feet AGL
+to clear 60% of the first Fresnel zone.

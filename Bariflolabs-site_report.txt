@@ -1,0 +1,11 @@
+
+	--==[ SPLAT! v1.4.2 Site Analysis Report For: Bariflolabs ]==--
+
+---------------------------------------------------------------------------
+
+Site location: 20.3592 North / 274.1774 West (20° 21' 33" N / 274° 10' 38" W)
+Ground elevation: 0.00 feet AMSL
+Antenna height: 1.00 feet AGL / 1.00 feet AMSL
+
+---------------------------------------------------------------------------
+
